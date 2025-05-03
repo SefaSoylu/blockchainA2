@@ -1,4 +1,8 @@
-import MD5 from 'crypto-js/md5';
+const { InvA } = require('../InventoryAKeyPair.json');
+const { InvB }= require('../InventoryBKeyPair.json');
+const  { InvC } = require('../InventoryCKeyPair.json');
+const  { InvD } = require('../InventoryDKeyPair.json');
+const MD5 = require('crypto-js/md5');
 
 function egcd(a, b) {
     a = BigInt(a); 
@@ -27,54 +31,113 @@ function generateKeys(p, q, e) {
     const n = p * q; 
     const phi = (p - 1n) * (q - 1n); 
     const d = modinv(e, phi); 
-    
+    console.log('N: ', n);
     return {
         publicKey: { e, n },
-        privateKey: { d, n }
+        privateKey: { d, n },
     };
 }
 
 function modPow(base, exp, mod) {
-    base = BigInt(base) % BigInt(mod);  // Ensure base is BigInt and handle modulus
-    exp = BigInt(exp); // Ensure exp is BigInt
-    mod = BigInt(mod); // Ensure mod is BigInt
+    base = BigInt(base) % BigInt(mod);  
+    exp = BigInt(exp); 
+    mod = BigInt(mod); 
     
-    let result = 1n; // Initialize result
+    let result = 1n; 
     while (exp > 0n) {
-        // If exp is odd, multiply base with the result
+        
         if (exp % 2n === 1n) {
             result = (result * base) % mod;
         }
-        // Now exp must be even
-        exp = exp / 2n;  // Divide exp by 2
-        base = (base * base) % mod;  // Square the base
+        
+        exp = exp / 2n;  
+        base = (base * base) % mod;  
     }
     return result;
 }
 
 
 function generateMD5Hash(data) {
-    return MD5(data).toString(); // Returns the MD5 hash as a string
+    return MD5(data).toString(); 
   }
 
 function signRecord(privateKey, record) {
-    const recordStr = JSON.stringify(record);   // Serialize the record
-    const recordHash = generateMD5Hash(recordStr); // Hash the record (still a string)
+    //const recordStr = JSON.stringify(record);   
+    const recordHash = generateMD5Hash(record);
     
     // Convert the MD5 hash string to BigInt
-    const recordHashBigInt = BigInt('0x' + recordHash);  // Ensure it's a valid hex string
+    const recordHashBigInt = BigInt('0x' + recordHash);  
     
-    console.log('Record Hash BigInt:', recordHashBigInt); // Log hash to check value
-    console.log('Private Key d:', privateKey.d); // Log private key to check its value
+    console.log('Record Hash BigInt:', recordHashBigInt); 
     
     // Use modPow to sign the record
     const signature = modPow(recordHashBigInt, privateKey.d, privateKey.n); 
     
-    console.log('Signature:', signature); // Log the signature result
+    console.log('Signature:', signature); 
     
     return signature;
 }
 
-  
+function verify(message, signature, senderLocation) {
+    const inventoryList = ['A', 'B', 'C', 'D'];
+    const verifiedBy = [];
 
-export { generateKeys, signRecord };
+    const senderKey = recieveKeyPair(senderLocation);
+
+    for (let i = 0; i < inventoryList.length; i++) {
+        const verifier = inventoryList[i];
+        if (verifier !== senderLocation) {
+            const recordVerify = modPow(signature, senderKey.publicKey.e, senderKey.publicKey.n);
+            if (recordVerify === message) {
+                verifiedBy.push(verifier);
+            }
+        }
+    }
+
+    return verifiedBy; // return list of successful verifiers
+}
+
+function invLocation(location){
+    if (location === 'A'){
+        const {p, q, e } = InvA;
+        console.log('Received values from invLocation in RSA:', { p, q, e });
+        return {p, q, e};
+    }
+    if (location === 'B'){
+        const {p, q, e } = InvB;
+        return {p, q, e};
+    }
+    if (location === 'C'){
+        const {p, q, e } = InvC;
+        return {p, q, e};
+    }
+    if (location === 'D'){
+        const {p, q, e } = InvD;
+        return {p, q, e};
+    }
+}
+
+  function recieveKeyPair(location){
+    if (location === 'A'){
+        return InvA.keyPair;
+    }
+    if (location === 'B'){
+        return InvB.keyPair;
+    }
+    if (location === 'C'){
+        return InvC.keyPair;
+    }
+    if (location === 'D'){
+        return InvD.keyPair;
+    }
+  }
+
+module.exports = {
+    generateKeys,
+    modinv,
+    signRecord,
+    verify,
+    generateMD5Hash,
+    invLocation, 
+    modPow
+  };
