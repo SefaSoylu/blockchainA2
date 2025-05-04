@@ -48,6 +48,42 @@ app.post('/api/generateKeys', (req, res) => {
     res.json({ publicKey: serializedPublicKey, privateKey: serializedPrivateKey });
 });
 
+app.post('/api/addToDatabase', (req, res) => {
+    console.log(req.body);
+    const {id, qty, price, location } = req.body.item;
+    console.log(id);
+    const keyDir = path.join(__dirname, '../src');
+    const inventories = ['A', 'B', 'C', 'D'];
+    for (let i = 0; i < inventories.length; i++){
+        console.log(i);
+        const keyPath = path.join(keyDir, `Inventory${inventories[i]}.json`);
+        console.log(keyPath);
+
+        let data = {};
+        if (fs.existsSync(keyPath)) {
+            const raw = fs.readFileSync(keyPath, 'utf-8');
+            data = JSON.parse(raw);
+        }
+
+        if (!Array.isArray(data)) {
+            data = [];
+        }
+
+        // Check if item exists
+        const existingIndex = data.findIndex(item => item.id === id);
+        if (existingIndex !== -1) {
+            // Update existing item
+            data[existingIndex] = { id, qty, price, location };
+        } else {
+            // Add new item
+            data.push({ id, qty, price, location });
+        }
+
+        fs.writeFileSync(keyPath, JSON.stringify(data, null, 2));
+    }
+    res.json({message: 'Succesffuly added to all Inventories'});
+});
+
 app.listen(PORT, () => {
     console.log(`Key server running at http://localhost:3001`);
 });

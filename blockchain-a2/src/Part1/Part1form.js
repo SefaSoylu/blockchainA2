@@ -22,8 +22,6 @@ function Part1form(){
         D: InvD,
       };
 
-      
-
     useEffect(() => {
         const locations = ['A', 'B', 'C', 'D'];
     
@@ -49,6 +47,11 @@ function Part1form(){
         locations.forEach(loc => generateKeysHandler(loc));
       }, []);
       
+      useEffect(() => {
+        if (verifiedBy.length === 3) {
+          addToDatabase({ id, qty, price, location });
+        }
+      }, [verifiedBy]);
 
     function sign(event){
         event.preventDefault();
@@ -71,6 +74,15 @@ function Part1form(){
         const ver = verify(recordHashBigInt, signature, locationInput);
         setVerifiedBy(ver);
     }
+    function addToDatabase(item) {
+        fetch('/api/addToDatabase', {
+          method: 'POST',
+          body: JSON.stringify({ item }),
+          headers: { 'Content-Type': 'application/json' }
+        })
+          .catch(err => console.error(`Key generation error for Inv${location}:`, err));
+      }
+
     return(
         <>
         <h2>Generated Keys</h2>
@@ -119,6 +131,7 @@ function Part1form(){
         <h4>Power of Authority used for consensus. Meaning that if there is more than 50% of votes that have resulted in a failed verification the new stock is not added to the inventory.</h4>
         {verifiedBy.length > 0 ? (
         <ul>
+            
             {verifiedBy.map((v) => {
             const senderKeys = inventories[location]?.keyPair?.publicKey;
 
@@ -133,6 +146,7 @@ function Part1form(){
                 = {recordHash} = {veriPow}
                 </li>
             );
+            
             })}
         </ul>
         ) : (
