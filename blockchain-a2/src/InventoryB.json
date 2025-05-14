@@ -1,8 +1,8 @@
 [
   {
     "id": "001",
-    "qty": "36",
-    "price": "78",
+    "qty": "23",
+    "price": "23",
     "location": "A"
   },
   {
@@ -10,5 +10,29 @@
     "qty": "38",
     "price": "78",
     "location": "B"
+  },
+  {
+    "id": "004",
+    "qty": "23",
+    "price": "23",
+    "location": "A"
+  },
+  {
+    "id": "76",
+    "qty": "12321",
+    "price": "34",
+    "location": "A"
+  },
+  {
+    "id": "67",
+    "qty": "34",
+    "price": "3423",
+    "location": "D"
+  },
+  {
+    "id": "3",
+    "qty": "54",
+    "price": "65",
+    "location": "C"
   }
 ]

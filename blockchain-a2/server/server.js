@@ -84,6 +84,37 @@ app.post('/api/addToDatabase', (req, res) => {
     res.json({message: 'Succesffuly added to all Inventories'});
 });
 
+app.get('/api/inventory/:loc/:id', (req, res) => {
+    const loc = req.params.loc;
+    const itemId = req.params.id;
+
+    const filePath = path.join(__dirname, `../src/Inventory${loc}.json`);
+  
+    fs.readFile(filePath, 'utf-8', (err, jsonData) => {
+      if (err) {
+        console.error(`Error reading inventory:`, err);
+        return res.status(500).json({ error: 'Could not read inventory data' });
+      }
+  
+      try {
+        const allItems = JSON.parse(jsonData);
+  
+        // Check if any item matches the given ID (ignoring location)
+        const match = allItems.find(item => item.id === itemId);
+  
+        if (match) {
+          res.json({ exists: true, qty: match.qty });
+        } else {
+          res.json({ exists: false });
+        }
+      } catch (parseErr) {
+        console.error('Error parsing inventory file:', parseErr);
+        res.status(500).json({ error: 'Invalid inventory data' });
+      }
+    });
+  });
+  
+
 app.listen(PORT, () => {
     console.log(`Key server running at http://localhost:3001`);
 });

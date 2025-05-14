@@ -65,8 +65,9 @@ function signRecord(privateKey, record) {
     //const recordStr = JSON.stringify(record);   
     const recordHash = generateMD5Hash(record);
     
-    // Convert the MD5 hash string to BigInt
-    const recordHashBigInt = BigInt('0x' + recordHash);  
+    // Convert the MD5 hash string to decimal
+    const recordDec = BigInt("0x" + recordHash);
+    const recordHashBigInt = BigInt(recordDec);  
     
     console.log('Record Hash BigInt:', recordHashBigInt); 
     
