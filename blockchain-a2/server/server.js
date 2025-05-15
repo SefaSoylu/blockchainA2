@@ -113,7 +113,116 @@ app.get('/api/inventory/:loc/:id', (req, res) => {
       }
     });
   });
+
+  app.post('/api/shareT/:loc', (req, res) => {
+    const senderLoc = req.params.loc.toUpperCase(); // e.g., "A"
+    const tVal = req.body.t;
+    const inventories = ['A', 'B', 'C', 'D'];
+    const keyDir = path.join(__dirname, '../src'); // Adjust if needed
   
+    for (let i = 0; i < inventories.length; i++) {
+      const targetLoc = inventories[i]; // A, B, C, D
+      const filePath = path.join(keyDir, `Inventory${targetLoc}KeyPair.json`);
+  
+      if (!fs.existsSync(filePath)) {
+        console.warn(`File not found: ${filePath}`);
+        continue;
+      }
+  
+      const raw = fs.readFileSync(filePath, 'utf-8');
+      const jsonData = JSON.parse(raw);
+  
+      const key = `Inv${targetLoc}`;
+      if (!jsonData[key]) {
+        jsonData[key] = {};
+      }
+  
+      // e.g., adds "t_A": 12345 to each InvX
+      jsonData[key][`t_${senderLoc}`] = tVal;
+  
+      fs.writeFileSync(filePath, JSON.stringify(jsonData, null, 2));
+      console.log(`Updated ${filePath} with t_${senderLoc}: ${tVal}`);
+    }
+  
+    res.json({ message: 'Successfully shared T with all inventories.' });
+  });
+
+  app.post(`/api/addPKG`, (req, res) => {
+    const { keyPair } = req.body;
+    console.log("Received PKG:", keyPair);
+  
+    const keyDir = path.join(__dirname, '../src');
+    const keyPath = path.join(keyDir, `PKG.json`);
+  
+    // Read existing file
+    const raw = fs.readFileSync(keyPath, 'utf-8');
+    const jsonData = JSON.parse(raw);
+  
+    // Add keyPair to PKG object
+    jsonData['PKG'].keyPair = {
+      publicKey: keyPair.publicKey,
+      privateKey: keyPair.privateKey
+    };
+
+    fs.writeFileSync(keyPath, JSON.stringify(jsonData, null, 2));
+  
+    res.json({ message: 'PKG keyPair added successfully' });
+  });
+
+  app.post(`/api/addPOfficer`, (req, res) => {
+    const { keyPair } = req.body;
+    console.log("Received PKG:", keyPair);
+  
+    const keyDir = path.join(__dirname, '../src');
+    const keyPath = path.join(keyDir, `ProcurementOfficer.json`);
+  
+    // Read existing file
+    const raw = fs.readFileSync(keyPath, 'utf-8');
+    const jsonData = JSON.parse(raw);
+  
+    // Add keyPair to PKG object
+    jsonData['ProcurementOfficer'].keyPair = {
+      publicKey: keyPair.publicKey,
+      privateKey: keyPair.privateKey
+    };
+
+    fs.writeFileSync(keyPath, JSON.stringify(jsonData, null, 2));
+  
+    res.json({ message: 'PKG keyPair added successfully' });
+  });
+  
+  app.post('/api/shareS/:loc', (req, res) => {
+    const senderLoc = req.params.loc.toUpperCase(); // e.g., "A"
+    const sVal = req.body.s;
+    const inventories = ['A', 'B', 'C', 'D'];
+    const keyDir = path.join(__dirname, '../src'); // Adjust if needed
+  
+    for (let i = 0; i < inventories.length; i++) {
+      const targetLoc = inventories[i]; // A, B, C, D
+      const filePath = path.join(keyDir, `Inventory${targetLoc}KeyPair.json`);
+  
+      if (!fs.existsSync(filePath)) {
+        console.warn(`File not found: ${filePath}`);
+        continue;
+      }
+  
+      const raw = fs.readFileSync(filePath, 'utf-8');
+      const jsonData = JSON.parse(raw);
+  
+      const key = `Inv${targetLoc}`;
+      if (!jsonData[key]) {
+        jsonData[key] = {};
+      }
+  
+      // e.g., adds "t_A": 12345 to each InvX
+      jsonData[key][`s_${senderLoc}`] = sVal;
+  
+      fs.writeFileSync(filePath, JSON.stringify(jsonData, null, 2));
+      console.log(`Updated ${filePath} with s_${senderLoc}: ${sVal}`);
+    }
+  
+    res.json({ message: 'Successfully shared S with all inventories.' });
+  });
 
 app.listen(PORT, () => {
     console.log(`Key server running at http://localhost:3001`);

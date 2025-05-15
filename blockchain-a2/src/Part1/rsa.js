@@ -66,8 +66,7 @@ function signRecord(privateKey, record) {
     const recordHash = generateMD5Hash(record);
     
     // Convert the MD5 hash string to decimal
-    const recordDec = BigInt("0x" + recordHash);
-    const recordHashBigInt = BigInt(recordDec);  
+    const recordHashBigInt = BigInt("0x" + recordHash);
     
     console.log('Record Hash BigInt:', recordHashBigInt); 
     
@@ -84,16 +83,23 @@ function verify(message, signature, senderLocation) {
     const verifiedBy = [];
 
     const senderKey = recieveKeyPair(senderLocation);
+    console.log(senderKey);
 
     for (let i = 0; i < inventoryList.length; i++) {
         const verifier = inventoryList[i];
         if (verifier !== senderLocation) {
             const recordVerify = modPow(signature, senderKey.publicKey.e, senderKey.publicKey.n);
-            if (recordVerify === message) {
+            console.log(recordVerify);
+            console.log("message: ", message);
+            console.log("signature: ", signature);
+            console.log(senderKey.publicKey.e);
+            console.log(senderKey.publicKey.n);
+            if (recordVerify === BigInt(message)) {
                 verifiedBy.push(verifier);
             }
         }
     }
+    console.log(verifiedBy);
 
     return verifiedBy; // return list of successful verifiers
 }

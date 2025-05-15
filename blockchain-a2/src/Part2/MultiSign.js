@@ -1,4 +1,8 @@
 const {PKG, InventoryA, InventoryB, InventoryC, InventoryD} = require('../PKG.json');
+const {InvA} = require('../InventoryAKeyPair.json');
+const {InvB} = require('../InventoryBKeyPair.json');
+const {InvC} = require('../InventoryCKeyPair.json');
+const {InvD} = require('../InventoryDKeyPair.json');
 const MD5 = require('crypto-js/md5');
 
 function egcd(a, b) {
@@ -39,7 +43,7 @@ function modPow(base, exp, mod) {
 }
 
 function mod(a, b, mod) {
-    return a * b % mod;
+    return BigInt(a) * BigInt(b) % BigInt(mod);
 }
 
 function generateMD5Hash(data) {
@@ -64,6 +68,23 @@ function generatePKG(){
     };
 }
 
+function generateKeys(p, q, e) {
+    p = BigInt(p); 
+    q = BigInt(q);
+    e = BigInt(e); 
+
+    console.log(e);
+    
+    const n = p * q; 
+    const phi = (p - 1n) * (q - 1n); 
+    const d = modinv(e, phi); 
+    console.log('N: ', n);
+    return {
+        publicKey: { e, n },
+        privateKey: { d, n },
+    };
+}
+
 function createSecretKeys(privatePKG){
     console.log(PKG);
     const secretKeyA = modPow(BigInt(InventoryA.id), BigInt(privatePKG.d), BigInt(privatePKG.n));
@@ -79,11 +100,21 @@ function createSecretKeys(privatePKG){
     }
 }
 
-function createT(publicPKG){
-    const t_A = modPow(BigInt(InventoryA.rand), BigInt(publicPKG.e), BigInt(publicPKG.n));
-    const t_B = modPow(BigInt(InventoryB.rand), BigInt(publicPKG.e), BigInt(publicPKG.n));
-    const t_C = modPow(BigInt(InventoryC.rand), BigInt(publicPKG.e), BigInt(publicPKG.n));
-    const t_D = modPow(BigInt(InventoryD.rand), BigInt(publicPKG.e), BigInt(publicPKG.n));
+function createT(publicPKG, loc){
+    let currInv = '';
+    if (loc === 'A'){
+        currInv = InvA;
+    }else if (loc === 'B'){
+        currInv = InvB;
+    }else if (loc === 'C'){
+        currInv = InvC;
+    }else if(loc === 'D'){
+        currInv = InvD;
+    }
+    const t_A = currInv.t_A;
+    const t_B = currInv.t_B;
+    const t_C = currInv.t_C;
+    const t_D = currInv.t_D;
 
     console.log("t_A", t_A);
     console.log("t_B", t_B);
@@ -94,6 +125,13 @@ function createT(publicPKG){
     let t = mod(t2, t_D, publicPKG.n);
     return t;
 }
+
+function createS(s_A, s_B, s_C, s_D, n) {
+    const s1 = mod(s_A, s_B, n);
+    const s2 = mod(s1, s_C, n);
+    const s = mod(s2, s_D, n);
+    return s;
+}
 module.exports = {
-    generatePKG, createSecretKeys, createT, generateMD5Hash, modPow, mod
+    generatePKG, createSecretKeys, createT, generateMD5Hash, modPow, mod, generateKeys, createS
 }

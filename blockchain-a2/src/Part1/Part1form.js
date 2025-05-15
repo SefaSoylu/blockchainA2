@@ -22,9 +22,8 @@ function Part1form(){
         D: InvD,
       };
 
-    useEffect(() => {
+      function generateKeys(){
         const locations = ['A', 'B', 'C', 'D'];
-    
         function generateKeysHandler(location) {
           fetch('/api/generateKeys', {
             method: 'POST',
@@ -45,7 +44,7 @@ function Part1form(){
         }
     
         locations.forEach(loc => generateKeysHandler(loc));
-      }, []);
+      }
       
       useEffect(() => {
         if (verifiedBy.length > 1) {
@@ -55,12 +54,12 @@ function Part1form(){
 
     function sign(event){
         event.preventDefault();
+        generateKeys();
         setLocation(locationInput); // Set it officially on submit
 
         const record = `${id}${qty}${price}${locationInput}`;
         const hash = generateMD5Hash(record);
-        const recordDec = parseInt(hash, 16);
-        const recordHashBigInt = BigInt(recordDec);
+        const recordHashBigInt = BigInt("0x" + hash)
         console.log('Hash on Part1', recordHashBigInt);
         setRecordHash(recordHashBigInt);
 
@@ -89,6 +88,26 @@ function Part1form(){
 
     return(
         <>
+        <form onSubmit={sign}> 
+            <h1>Add a new record</h1>
+            <label htmlFor='id'>Item ID:</label>
+            <input type='number' required id='id' name='id' onChange={(e) => setId(e.target.value)}></input>
+            <label htmlFor='qty'>Item QTY:</label>
+            <input type='number' required id='qty' name='qty'onChange={(e) => setQty(e.target.value)}></input>
+            <label htmlFor='price'>Item Price:</label>
+            <input type='number'required id='price' name='price'onChange={(e) => setPrice(e.target.value)}></input>
+            <label htmlFor='locaion'>Location:</label>
+            <select id="location" required name="location" onChange={(e) => setLocationInput(e.target.value)}>
+                <option value="">Select location</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option> 
+                </select>
+            <input type="submit"value="Add new Record" ></input>
+
+        </form> 
+
         <h2>Generated Keys</h2>
         <div class='column'>
             {Object.entries(generatedKeys).map(([loc, keys]) => {
@@ -109,26 +128,6 @@ function Part1form(){
             );
             })}
             </div>
-
-        <form onSubmit={sign}> 
-            <h1>Add a new record</h1>
-            <label htmlFor='id'>Item ID:</label>
-            <input type='number' required id='id' name='id' onChange={(e) => setId(e.target.value)}></input>
-            <label htmlFor='qty'>Item QTY:</label>
-            <input type='number' required id='qty' name='qty'onChange={(e) => setQty(e.target.value)}></input>
-            <label htmlFor='price'>Item Price:</label>
-            <input type='number'required id='price' name='price'onChange={(e) => setPrice(e.target.value)}></input>
-            <label htmlFor='locaion'>Location:</label>
-            <select id="location" required name="location" onChange={(e) => setLocationInput(e.target.value)}>
-                <option value="">Select location</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option> 
-                </select>
-            <input type="submit"value="Add new Record" ></input>
-
-        </form> 
 
         <p>Signature from warehouse inputing new record: {signature}</p>
         <p>Record hash: {recordHash}</p>
