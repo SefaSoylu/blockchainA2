@@ -87,10 +87,10 @@ function generateKeys(p, q, e) {
 
 function createSecretKeys(privatePKG){
     console.log(PKG);
-    const secretKeyA = modPow(BigInt(InventoryA.id), BigInt(privatePKG.d), BigInt(privatePKG.n));
-    const secretKeyB = modPow(BigInt(InventoryB.id), BigInt(privatePKG.d), BigInt(privatePKG.n));
-    const secretKeyC = modPow(BigInt(InventoryC.id), BigInt(privatePKG.d), BigInt(privatePKG.n));
-    const secretKeyD = modPow(BigInt(InventoryD.id), BigInt(privatePKG.d), BigInt(privatePKG.n));
+    const secretKeyA = modPow(BigInt(InvA.id), BigInt(privatePKG.d), BigInt(privatePKG.n));
+    const secretKeyB = modPow(BigInt(InvB.id), BigInt(privatePKG.d), BigInt(privatePKG.n));
+    const secretKeyC = modPow(BigInt(InvC.id), BigInt(privatePKG.d), BigInt(privatePKG.n));
+    const secretKeyD = modPow(BigInt(InvD.id), BigInt(privatePKG.d), BigInt(privatePKG.n));
 
     return{
         secretKeyA: secretKeyA,

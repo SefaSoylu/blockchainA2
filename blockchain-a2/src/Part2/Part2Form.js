@@ -137,7 +137,7 @@ function Part2Form(){
                 body: JSON.stringify({ t: currT.toString() }),
                 headers: { 'Content-Type': 'application/json' }
               })
-                .then(res => res.json)
+                .then(res => res.json())
                 .catch(err => console.error(`failed to add t to Inv${loc}:`, err));
             });
             setTA(t_A);
@@ -241,7 +241,7 @@ function Part2Form(){
             body: JSON.stringify({ s: currS.toString() }),
             headers: { 'Content-Type': 'application/json' }
           })
-            .then(res => res.json)
+            .then(res => res.json())
             .catch(err => console.error(`failed to add s to Inv${loc}:`, err));
         });
 
@@ -374,11 +374,11 @@ function Part2Form(){
 
     return(
         <>
-        <form onSubmit={createPKG}> 
+        <form> 
             <h1>Inquire about a Record</h1>
             <label htmlFor='id'>Item ID:</label>
             <input type='number' required id='id' name='id' onChange={(e) => setId(e.target.value) }></input>
-            <input type="submit"value="Inquire" ></input>
+            <button type="button" onClick={createPKG}>Inquire</button>
         </form> 
         <p><strong>PKG Key Generation: </strong> <br/>
         {publicPKG && publicPKG.e && publicPKG.n ? (

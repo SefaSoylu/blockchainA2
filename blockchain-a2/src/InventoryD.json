@@ -2,20 +2,17 @@
   {
     "id": "001",
     "qty": "32",
-    "price": "12",
-    "location": "A"
+    "price": "12"
   },
   {
     "id": "002",
-    "qty": "38",
-    "price": "78",
-    "location": "B"
+    "qty": "32",
+    "price": "12"
   },
   {
     "id": "004",
-    "qty": "38",
-    "price": "12",
-    "location": "B"
+    "qty": "32",
+    "price": "12"
   },
   {
     "id": "76",
@@ -40,5 +37,11 @@
     "qty": "21",
     "price": "23",
     "location": "B"
+  },
+  {
+    "id": "00",
+    "qty": "32",
+    "price": "12",
+    "location": "A"
   }
 ]
